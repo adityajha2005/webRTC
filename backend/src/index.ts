@@ -35,6 +35,20 @@ wss.on("connection",function connection(ws){
                 }))
             }
         }
+        else if(message.type==="ice-candidate"){
+            if(ws===senderSocket){
+                receiverSocket?.send(JSON.stringify({
+                    type:"ice-candidate",
+                    candidate:message.candidate
+                }))
+            }
+            else if(ws===receiverSocket){
+                senderSocket?.send(JSON.stringify({
+                    type:"ice-candidate",
+                    candidate:message.candidate
+                }))
+            }
+        }
         console.log(message);
     });
 
