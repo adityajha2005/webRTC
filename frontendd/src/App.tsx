@@ -1,18 +1,21 @@
-import { useState } from 'react'
-import './App.css'
-import { Routes, Route , BrowserRouter} from 'react-router-dom'
-import {Sender} from './components/Sender'
-import {Receiver} from './components/Receiver'
-function App() {
+import { useState } from 'react';
+import { VideoCall } from './components/VideoCall';
+import './styles/MediaControls.css';
 
-  return (
-   <BrowserRouter>
-    <Routes>
-      <Route path='/sender' element={<Sender/>}/>
-      <Route path='/receiver' element={<Receiver/>}/>
-    </Routes>
-   </BrowserRouter>
-  )
+function App() {
+    const [role, setRole] = useState<'sender' | 'receiver' | null>(null);
+
+    if (!role) {
+        return (
+            <div className="role-selection">
+                <h1>Select Your Role</h1>
+                <button onClick={() => setRole('sender')}>Join as Sender</button>
+                <button onClick={() => setRole('receiver')}>Join as Receiver</button>
+            </div>
+        );
+    }
+
+    return <VideoCall role={role} />;
 }
 
-export default App
+export default App;
