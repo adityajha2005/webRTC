@@ -14,12 +14,15 @@ wss.on("connection",function connection(ws){
         //create answer
         //add ice candidate
         if(message.type==="identify-as-sender"){
+            console.log("identify as sender");
             senderSocket=ws;
         }
         else if(message.type==="identify-as-receiver"){
+            console.log("identify as receiver");
             receiverSocket=ws;  
         }
         else if(message.type==="create-offer"){
+            console.log("create offer");
             if (receiverSocket) {
                 receiverSocket.send(JSON.stringify({
                     type:"offer",
@@ -28,14 +31,16 @@ wss.on("connection",function connection(ws){
             }
         }
         else if(message.type==="create-answer"){
+            console.log("create answer");
             if(senderSocket){
                 senderSocket.send(JSON.stringify({
-                    type:"offer",
-                    offer:message.offer
+                    type:"answer",
+                    answer:message.answer
                 }))
             }
         }
         else if(message.type==="ice-candidate"){
+            console.log("ice candidate");
             if(ws===senderSocket){
                 receiverSocket?.send(JSON.stringify({
                     type:"ice-candidate",
@@ -53,5 +58,4 @@ wss.on("connection",function connection(ws){
     });
 
     ws.send('something');
-
 })

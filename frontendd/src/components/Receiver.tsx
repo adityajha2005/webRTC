@@ -9,12 +9,23 @@ export function Receiver(){
             }))   
         }
         socket.onmessage=async (event)=>{
+            let pc:RTCPeerConnection | null = null;
             const message = JSON.parse(event.data)
             if(message.type==="offer"){
                 //receive offer from sender (signaling server)
-                const pc = new RTCPeerConnection();
+                pc = new RTCPeerConnection();
                 //set remote description to offer
                 pc.setRemoteDescription(message.offer)
+                //add event listener for ice candidates
+                pc.onicecandidate=(event)=>{
+                    console.log("ice candidate");
+                    if(event.candidate){
+                        socket?.send(JSON.stringify({
+                            type:"ice-candidate",
+                            candidate:event.candidate
+                        }))
+                    }
+                }
                 //create an answer
                 const answer = await pc.createAnswer();
                 //set local description to answer
@@ -23,9 +34,15 @@ export function Receiver(){
                 socket.send(
                     JSON.stringify({
                         type:"create-answer",
-                        offer:pc.localDescription
+                        answer:pc.localDescription
                     })
                 )
+            
+            } else if(message.type==="ice-candidate"){
+                if(pc !==null){
+                    //@ts-ignore
+                    pc.addIceCandidate(message.candidate)
+                }
             }
         }
     },[])

@@ -21,6 +21,16 @@ export function Sender(){
         const offer = await pc.createOffer(); //sdp
         //set local description to offer
         await pc.setLocalDescription(offer);
+        //add event listener for ice candidates
+        pc.onicecandidate=(event)=>{
+            console.log("ice candidate");
+            if(event.candidate){
+                socket?.send(JSON.stringify({
+                    type:"ice-candidate",
+                    candidate:event.candidate
+                }))
+            }
+        }
         //send offer to receiver through signaling server
         socket?.send(JSON.stringify({
             type:"create-offer",
@@ -29,7 +39,11 @@ export function Sender(){
         socket.onmessage=(event)=>{
             const data = JSON.parse(event.data)
             if(data.type==="answer"){
-                pc.setRemoteDescription(data.offer)
+                pc.setRemoteDescription(data.answer)
+            }
+            else if(data.type==="ice-candidate"){
+                //@ts-ignore
+                pc.addIceCandidate(data.candidate)
             }
         }
 
