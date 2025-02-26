@@ -5,7 +5,7 @@ export function Receiver(){
         const socket = new WebSocket('ws://localhost:8080')
         socket.onopen=()=>{
             socket.send(JSON.stringify({
-                type:"receiver"
+                type:"identify-as-receiver"
             }))   
         }
         socket.onmessage=async (event)=>{
@@ -14,7 +14,7 @@ export function Receiver(){
                 //receive offer from sender (signaling server)
                 const pc = new RTCPeerConnection();
                 //set remote description to offer
-                pc.setRemoteDescription(message.sdp)
+                pc.setRemoteDescription(message.offer)
                 //create an answer
                 const answer = await pc.createAnswer();
                 //set local description to answer
@@ -22,8 +22,8 @@ export function Receiver(){
                 //send answer to sender through signaling server
                 socket.send(
                     JSON.stringify({
-                        type:"createAnswer",
-                        sdp:pc.localDescription
+                        type:"create-answer",
+                        offer:pc.localDescription
                     })
                 )
             }

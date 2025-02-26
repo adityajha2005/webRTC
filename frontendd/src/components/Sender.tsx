@@ -6,10 +6,11 @@ export function Sender(){
         const socket = new WebSocket('ws://localhost:8080')
         socket.onopen=()=>{
             socket.send(JSON.stringify({
-                type:"sender"
+                type:"identify-as-sender"
             }))
 
         }
+        setSocket(socket)
     },[])
 
     async function startSendingVideo(){
@@ -22,13 +23,13 @@ export function Sender(){
         await pc.setLocalDescription(offer);
         //send offer to receiver through signaling server
         socket?.send(JSON.stringify({
-            type:"createOffer",
-            sdp:pc.localDescription
+            type:"create-offer",
+            offer:pc.localDescription
         }))
         socket.onmessage=(event)=>{
             const data = JSON.parse(event.data)
-            if(data.type==="createAnswer"){
-                pc.setRemoteDescription(data.sdp)
+            if(data.type==="answer"){
+                pc.setRemoteDescription(data.offer)
             }
         }
 
